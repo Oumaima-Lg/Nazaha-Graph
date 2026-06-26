@@ -153,3 +153,16 @@ pnpm start
 
 **Port déjà utilisé**  
 → Changer le port : `uvicorn main:app --reload --port 8001` et mettre à jour `NEXT_PUBLIC_API_URL` en conséquence.
+
+
+
+
+
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+uvicorn main:app --reload --port 8000
+
+
+cd fraud-detection-ui
+pnpm dev
