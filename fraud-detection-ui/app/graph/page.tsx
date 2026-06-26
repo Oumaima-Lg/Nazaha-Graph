@@ -478,7 +478,7 @@ function GraphPageInner() {
 
       {/* ── Layout principal : sidebar + graphe ──────────────────── */}
       {!loading && (
-        <div className={`flex gap-6 items-start ${isExternalFilter ? '' : ''}`}>
+        <div className="flex gap-6 items-start">
 
           {/* Sidebar de filtres (masquée en mode navigation externe) */}
           {!isExternalFilter && (

@@ -22,8 +22,8 @@ export default function ContractsPage() {
           setContracts(
             data.contracts.map((c) => ({
               id: c.id,
-              title: c.title,
-              vendor: c.vendor,
+              titleKey: c.title,
+              vendorKey: c.vendor,
               amount: c.amount,
               date: c.date,
               status: c.status,
