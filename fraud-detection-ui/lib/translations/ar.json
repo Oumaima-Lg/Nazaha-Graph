@@ -1,0 +1,205 @@
+{
+  "app": {
+    "title": "ناظاة - جراف",
+    "subtitle": "كشف الاحتيال"
+  },
+  "navigation": {
+    "dashboard": "لوحة التحكم",
+    "graph": "تحليل الشبكة",
+    "contracts": "العقود",
+    "report": "تقرير جديد"
+  },
+  "pages": {
+    "dashboard": {
+      "title": "لوحة التحكم",
+      "subtitle": "ملخص القضايا المكتشفة والتحقيقات الجارية"
+    },
+    "graph": {
+      "title": "تحليل الشبكة",
+      "subtitle": "تصور الاتصالات بين الكيانات وأنماط التواطؤ"
+    },
+    "contracts": {
+      "title": "العقود العامة",
+      "subtitle": "البحث والتصفية على العقود المحللة"
+    },
+    "report": {
+      "title": "تقرير جديد",
+      "subtitle": "تقديم بلاغ مجهول الهوية عن الاشتباه في الفساد"
+    }
+  },
+  "kpis": {
+    "fraudCasesDetected": "العقد المشبوهة المكتشفة",
+    "underInvestigation": "تحت التحقيق",
+    "contractsAnalyzed": "العقود المحللة"
+  },
+  "chart": {
+    "title": "اتجاه الحالات",
+    "legendCases": "الحالات",
+    "legendResolved": "المحلولة",
+    "legendPending": "قيد الانتظار"
+  },
+  "alerts": {
+    "title": "التنبيهات النشطة",
+    "subtitle": "الحالات التي تتطلب تحقيقاً فوريّاً",
+    "table": {
+      "title": "العنوان",
+      "description": "الوصف",
+      "severity": "الشدة",
+      "date": "التاريخ",
+      "status": "الحالة",
+      "action": "إجراء"
+    },
+    "status": {
+      "investigating": "قيد التحقيق",
+      "pending": "قيد الانتظار",
+      "resolved": "محلول"
+    },
+    "severity": {
+      "high": "عالي",
+      "medium": "متوسط",
+      "low": "منخفض"
+    }
+  },
+  "contracts": {
+    "search": "البحث عن المعرّف أو العنوان أو المورّد...",
+    "filter": "التصفية حسب الحالة",
+    "filterAll": "جميع الحالات",
+    "table": {
+      "id": "رقم العقد",
+      "title": "العنوان",
+      "vendor": "المورّد",
+      "amount": "المبلغ",
+      "date": "التاريخ",
+      "status": "الحالة",
+      "risk": "المخاطر"
+    },
+    "status": {
+      "sain": "صحيح",
+      "suspect": "مريب",
+      "rejete": "مرفوض"
+    },
+    "contractData": {
+      "contract1": "بناء الطريق أ-45",
+      "contract2": "خدمات الاستشارات تكنولوجيا المعلومات",
+      "contract3": "إمدادات المعدات الطبية",
+      "contract4": "صيانة البنية التحتية",
+      "contract5": "أعمال البناء العام مركز المجتمع",
+      "contract6": "الأمن والمراقبة"
+    },
+    "vendors": {
+      "vendorA": "الشركة أ",
+      "vendorB": "الشركة ب",
+      "vendorC": "الشركة ج",
+      "vendorD": "الشركة د",
+      "vendorE": "الشركة هـ",
+      "supplierCommon": "مورد مشترك"
+    }
+  },
+  "graph": {
+    "nodeTypes": {
+      "person": "شخص",
+      "company": "شركة",
+      "tender": "عطاء",
+      "supplier": "مورّد",
+      "agency": "وكالة"
+    },
+    "panel": {
+      "title": "تفاصيل العقدة",
+      "type": "النوع",
+      "connections": "الاتصالات",
+      "collusionRisk": "تم اكتشاف خطر التواطؤ",
+      "details": "انظر الشبكة الكاملة للعلاقات"
+    }
+  },
+  "report": {
+    "form": {
+      "title": "معلومات التقرير",
+      "titleLabel": "عنوان التقرير *",
+      "descriptionLabel": "وصف تفصيلي",
+      "urgencyLabel": "مستوى الأولوية",
+      "urgencyLow": "منخفضة",
+      "urgencyMedium": "متوسطة",
+      "urgencyHigh": "عالية",
+      "filesLabel": "وثائق داعمة",
+      "dragDropText": "اسحب الملفات هنا أو انقر للتحديد",
+      "fileTypes": "PDF و DOC و DOCX و XLS و XLSX و CSV — حد أقصى 10 ميجابايت لكل ملف",
+      "submitButton": "إرسال التقرير"
+    },
+    "history": {
+      "title": "التقارير الأخيرة",
+      "submitted": "تم التقديم:",
+      "status": "الحالة:",
+      "statusCompleted": "مكتمل"
+    },
+    "success": "تم إرسال التقرير مجهول الهوية. احتفظ بالرمز المميز للمتابعة.",
+    "error": "خطأ في إرسال التقرير. يرجى المحاولة مرة أخرى.",
+    "reportData": {
+      "report1": "تحقيق الربع الرابع 2023",
+      "report2": "تدقيق خاص — قطاع البناء"
+    }
+  },
+  "header": {
+    "search": "البحث عن الحالات والعقود...",
+    "notifications": "التنبيهات",
+    "language": "اللغة"
+  },
+  "common": {
+    "close": "إغلاق",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "details": "التفاصيل",
+    "investigate": "تحقيق",
+    "cases": "الحالات",
+    "pending": "قيد الانتظار",
+    "resolved": "المحلولة"
+  },
+  "months": {
+    "jan": "يناير",
+    "feb": "فبراير",
+    "mar": "مارس",
+    "apr": "أبريل",
+    "may": "مايو",
+    "jun": "يونيو",
+    "jul": "يوليو",
+    "aug": "أغسطس"
+  },
+  "alertData": {
+    "suspiciousBidding": {
+      "title": "سلوك عطاء مريب",
+      "description": "عدة كيانات تقدم عطاءات بهوامش متطابقة"
+    },
+    "priceFixing": {
+      "title": "نشاط تثبيت الأسعار",
+      "description": "تنسيق الأسعار المكتشف بين الموردين"
+    },
+    "unusualCoalition": {
+      "title": "تحالف عاطي غير معتاد",
+      "description": "نمط جديد: الشركات أ و ب و ج تقدم عطاءات معاً باستمرار"
+    },
+    "documentAnomaly": {
+      "title": "شذوذ المستند",
+      "description": "عُثر على جمل متطابقة في 5 اقتراحات مختلفة"
+    }
+  },
+  "graphLabels": {
+    "collusionNetwork": "شبكة التواطؤ",
+    "clickNodesInfo": "انقر على العقد لعرض التفاصيل وبيانات INPPLC",
+    "detectedCollusion": "تم اكتشاف التواطؤ"
+  },
+  "entities": {
+    "companiesA": "الشركة أ",
+    "companiesB": "الشركة ب",
+    "companiesC": "الشركة ج",
+    "companiesD": "الشركة د",
+    "companiesE": "الشركة هـ",
+    "tender1": "عطاء البنية التحتية للطرق",
+    "tender2": "عطاء المستلزمات الطبية",
+    "directorX": "المدير س",
+    "directorY": "المدير ص",
+    "directorZ": "المدير ع",
+    "commonSupplier": "مورد مشترك",
+    "purchasingOffice": "مديرية المشتريات"
+  }
+}

@@ -1,0 +1,205 @@
+{
+  "app": {
+    "title": "Nazaha-Graph",
+    "subtitle": "Fraud Detection"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "graph": "Network Analysis",
+    "contracts": "Contracts",
+    "report": "New Report"
+  },
+  "pages": {
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Summary of detected cases and ongoing investigations"
+    },
+    "graph": {
+      "title": "Network Analysis",
+      "subtitle": "Visualization of entity connections and collusion patterns"
+    },
+    "contracts": {
+      "title": "Public Contracts",
+      "subtitle": "Search and filter analyzed contracts"
+    },
+    "report": {
+      "title": "New Report",
+      "subtitle": "Anonymously submit a fraud suspicion report"
+    }
+  },
+  "kpis": {
+    "fraudCasesDetected": "Suspect Nodes Detected",
+    "underInvestigation": "Under Investigation",
+    "contractsAnalyzed": "Contracts Analyzed"
+  },
+  "chart": {
+    "title": "Cases Trend",
+    "legendCases": "Cases",
+    "legendResolved": "Resolved",
+    "legendPending": "Pending"
+  },
+  "alerts": {
+    "title": "Active Alerts",
+    "subtitle": "Cases requiring immediate investigation",
+    "table": {
+      "title": "Title",
+      "description": "Description",
+      "severity": "Severity",
+      "date": "Date",
+      "status": "Status",
+      "action": "Action"
+    },
+    "status": {
+      "investigating": "Investigating",
+      "pending": "Pending",
+      "resolved": "Resolved"
+    },
+    "severity": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    }
+  },
+  "contracts": {
+    "search": "Search ID, title or vendor...",
+    "filter": "Filter by status",
+    "filterAll": "All statuses",
+    "table": {
+      "id": "Contract ID",
+      "title": "Title",
+      "vendor": "Vendor",
+      "amount": "Amount",
+      "date": "Date",
+      "status": "Status",
+      "risk": "Risk"
+    },
+    "status": {
+      "sain": "Valid",
+      "suspect": "Suspect",
+      "rejete": "Rejected"
+    },
+    "contractData": {
+      "contract1": "Road A-45 Construction",
+      "contract2": "IT Consulting Services",
+      "contract3": "Medical Equipment Supply",
+      "contract4": "Infrastructure Maintenance",
+      "contract5": "Community Center Public Works",
+      "contract6": "Security and Surveillance"
+    },
+    "vendors": {
+      "vendorA": "Company A SARL",
+      "vendorB": "Company B SA",
+      "vendorC": "Company C SNC",
+      "vendorD": "Company D",
+      "vendorE": "Company E",
+      "supplierCommon": "Common Supplier"
+    }
+  },
+  "graph": {
+    "nodeTypes": {
+      "person": "Person",
+      "company": "Company",
+      "tender": "Tender",
+      "supplier": "Supplier",
+      "agency": "Agency"
+    },
+    "panel": {
+      "title": "Node Details",
+      "type": "Type",
+      "connections": "Connections",
+      "collusionRisk": "Collusion Risk Detected",
+      "details": "See full network for relationships"
+    }
+  },
+  "report": {
+    "form": {
+      "title": "Report Information",
+      "titleLabel": "Report Title *",
+      "descriptionLabel": "Detailed description",
+      "urgencyLabel": "Urgency Level",
+      "urgencyLow": "Low",
+      "urgencyMedium": "Medium",
+      "urgencyHigh": "High",
+      "filesLabel": "Supporting documents",
+      "dragDropText": "Drag files here or click to select",
+      "fileTypes": "PDF, DOC, DOCX, XLS, XLSX, CSV — max 10 MB per file",
+      "submitButton": "Submit Report"
+    },
+    "history": {
+      "title": "Recent Reports",
+      "submitted": "Submitted:",
+      "status": "Status:",
+      "statusCompleted": "Completed"
+    },
+    "success": "Report submitted anonymously. Keep your token for follow-up.",
+    "error": "Error submitting report. Please try again.",
+    "reportData": {
+      "report1": "Q4 2023 Investigation",
+      "report2": "Special Audit — Construction Sector"
+    }
+  },
+  "header": {
+    "search": "Search cases, contracts...",
+    "notifications": "Notifications",
+    "language": "Language"
+  },
+  "common": {
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "details": "Details",
+    "investigate": "Investigate",
+    "cases": "Cases",
+    "pending": "Pending",
+    "resolved": "Resolved"
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Feb",
+    "mar": "Mar",
+    "apr": "Apr",
+    "may": "May",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aug"
+  },
+  "alertData": {
+    "suspiciousBidding": {
+      "title": "Suspicious Bidding Behavior",
+      "description": "Multiple entities placing bids with identical margins"
+    },
+    "priceFixing": {
+      "title": "Price Fixing Activity",
+      "description": "Coordinated pricing detected across suppliers"
+    },
+    "unusualCoalition": {
+      "title": "Unusual Bidder Coalition",
+      "description": "New pattern: Companies A, B, and C consistently bid together"
+    },
+    "documentAnomaly": {
+      "title": "Document Anomaly",
+      "description": "Identical clauses found in 5 different proposals"
+    }
+  },
+  "graphLabels": {
+    "collusionNetwork": "Collusion Network",
+    "clickNodesInfo": "Click on nodes to view details and INPPLC data",
+    "detectedCollusion": "Collusion Detected"
+  },
+  "entities": {
+    "companiesA": "Company A SARL",
+    "companiesB": "Company B SA",
+    "companiesC": "Company C SNC",
+    "companiesD": "Company D",
+    "companiesE": "Company E",
+    "tender1": "Road Infrastructure Tender",
+    "tender2": "Medical Supplies Tender",
+    "directorX": "Director X",
+    "directorY": "Director Y",
+    "directorZ": "Director Z",
+    "commonSupplier": "Common Supplier",
+    "purchasingOffice": "Purchasing Directorate"
+  }
+}

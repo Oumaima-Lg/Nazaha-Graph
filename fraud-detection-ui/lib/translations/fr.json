@@ -1,0 +1,205 @@
+{
+  "app": {
+    "title": "Nazaha-Graph",
+    "subtitle": "Détection Fraude"
+  },
+  "navigation": {
+    "dashboard": "Tableau de Bord",
+    "graph": "Analyse Réseau",
+    "contracts": "Contrats",
+    "report": "Nouveau Rapport"
+  },
+  "pages": {
+    "dashboard": {
+      "title": "Tableau de Bord",
+      "subtitle": "Résumé des cas détectés et en investigation"
+    },
+    "graph": {
+      "title": "Analyse Réseau",
+      "subtitle": "Visualisation des connexions entre entités et patterns de collusion"
+    },
+    "contracts": {
+      "title": "Contrats Publics",
+      "subtitle": "Recherche et filtrage des contrats analysés"
+    },
+    "report": {
+      "title": "Nouveau Rapport",
+      "subtitle": "Soumettre anonymement un signalement de suspicion de fraude"
+    }
+  },
+  "kpis": {
+    "fraudCasesDetected": "Nœuds suspects détectés",
+    "underInvestigation": "En investigation",
+    "contractsAnalyzed": "Contrats analysés"
+  },
+  "chart": {
+    "title": "Tendance des Cas",
+    "legendCases": "Cas",
+    "legendResolved": "Résolus",
+    "legendPending": "En attente"
+  },
+  "alerts": {
+    "title": "Alertes Actives",
+    "subtitle": "Les cas qui nécessitent une investigation immédiate",
+    "table": {
+      "title": "Titre",
+      "description": "Description",
+      "severity": "Sévérité",
+      "date": "Date",
+      "status": "État",
+      "action": "Action"
+    },
+    "status": {
+      "investigating": "Investigation",
+      "pending": "En attente",
+      "resolved": "Résolu"
+    },
+    "severity": {
+      "high": "Élevée",
+      "medium": "Moyenne",
+      "low": "Basse"
+    }
+  },
+  "contracts": {
+    "search": "Rechercher ID, titre ou fournisseur...",
+    "filter": "Filtrer par état",
+    "filterAll": "Tous les états",
+    "table": {
+      "id": "ID Contrat",
+      "title": "Titre",
+      "vendor": "Fournisseur",
+      "amount": "Montant",
+      "date": "Date",
+      "status": "État",
+      "risk": "Risque"
+    },
+    "status": {
+      "sain": "Valide",
+      "suspect": "Suspect",
+      "rejete": "Rejeté"
+    },
+    "contractData": {
+      "contract1": "Construction Route A-45",
+      "contract2": "Services de Consultation IT",
+      "contract3": "Fourniture d'Équipements Médicaux",
+      "contract4": "Entretien Infrastructure",
+      "contract5": "Travaux Publics Centre Communautaire",
+      "contract6": "Sécurité et Surveillance"
+    },
+    "vendors": {
+      "vendorA": "Entreprise A SARL",
+      "vendorB": "Entreprise B SA",
+      "vendorC": "Entreprise C SNC",
+      "vendorD": "Entreprise D",
+      "vendorE": "Entreprise E",
+      "supplierCommon": "Fournisseur Commun"
+    }
+  },
+  "graph": {
+    "nodeTypes": {
+      "person": "Personne",
+      "company": "Société",
+      "tender": "Appel d'offres",
+      "supplier": "Fournisseur",
+      "agency": "Agence"
+    },
+    "panel": {
+      "title": "Détails du Nœud",
+      "type": "Type",
+      "connections": "Connexions",
+      "collusionRisk": "Risque de Collusion Détecté",
+      "details": "Voir le réseau complet pour les relations"
+    }
+  },
+  "report": {
+    "form": {
+      "title": "Informations du Signalement",
+      "titleLabel": "Titre du Signalement *",
+      "descriptionLabel": "Description détaillée",
+      "urgencyLabel": "Niveau d'Urgence",
+      "urgencyLow": "Basse",
+      "urgencyMedium": "Moyenne",
+      "urgencyHigh": "Élevée",
+      "filesLabel": "Documents justificatifs",
+      "dragDropText": "Glissez des fichiers ici ou cliquez pour sélectionner",
+      "fileTypes": "PDF, DOC, DOCX, XLS, XLSX, CSV — max 10 MB par fichier",
+      "submitButton": "Soumettre le Signalement"
+    },
+    "history": {
+      "title": "Signalements Récents",
+      "submitted": "Soumis :",
+      "status": "État :",
+      "statusCompleted": "Complété"
+    },
+    "success": "Signalement enregistré anonymement. Conservez votre jeton pour le suivi.",
+    "error": "Erreur lors de l'envoi du signalement. Veuillez réessayer.",
+    "reportData": {
+      "report1": "Investigation Q4 2023",
+      "report2": "Audit Spécial — Secteur Construction"
+    }
+  },
+  "header": {
+    "search": "Rechercher cas, contrats...",
+    "notifications": "Notifications",
+    "language": "Langue"
+  },
+  "common": {
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "details": "Détails",
+    "investigate": "Investiguer",
+    "cases": "Cas",
+    "pending": "En attente",
+    "resolved": "Résolus"
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Fév",
+    "mar": "Mar",
+    "apr": "Avr",
+    "may": "Mai",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aoû"
+  },
+  "alertData": {
+    "suspiciousBidding": {
+      "title": "Comportement d'enchères suspect",
+      "description": "Plusieurs entités font des offres avec des marges identiques"
+    },
+    "priceFixing": {
+      "title": "Activité de fixation de prix",
+      "description": "Coordination de prix détectée entre fournisseurs"
+    },
+    "unusualCoalition": {
+      "title": "Coalition d'enchérisseurs inhabituelle",
+      "description": "Nouveau modèle : Sociétés A, B et C font conjointement des offres"
+    },
+    "documentAnomaly": {
+      "title": "Anomalie de document",
+      "description": "Clauses identiques trouvées dans 5 propositions différentes"
+    }
+  },
+  "graphLabels": {
+    "collusionNetwork": "Réseau de Collusion",
+    "clickNodesInfo": "Cliquez sur les nœuds pour voir les détails et les données INPPLC",
+    "detectedCollusion": "Collusion détectée"
+  },
+  "entities": {
+    "companiesA": "Entreprise A SARL",
+    "companiesB": "Entreprise B SA",
+    "companiesC": "Entreprise C SNC",
+    "companiesD": "Entreprise D",
+    "companiesE": "Entreprise E",
+    "tender1": "Marché infrastructure routière",
+    "tender2": "Fournitures médicales",
+    "directorX": "Directeur X",
+    "directorY": "Directeur Y",
+    "directorZ": "Directeur Z",
+    "commonSupplier": "Fournisseur Commun",
+    "purchasingOffice": "Direction des Achats"
+  }
+}
