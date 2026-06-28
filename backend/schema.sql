@@ -402,7 +402,7 @@ CREATE VIEW graph_nodes AS
 -- ============================================================
 CREATE VIEW graph_edges AS
     SELECT
-        id,
+        id::TEXT            AS id,
         'public_links'      AS edge_type,
         person_id::TEXT     AS source_id,
         agency_id::TEXT     AS target_id,
@@ -413,7 +413,7 @@ CREATE VIEW graph_edges AS
     FROM public_links
   UNION ALL
     SELECT
-        id,
+        id::TEXT             AS id,
         'professional_links' AS edge_type,
         person_id::TEXT      AS source_id,
         company_id::TEXT     AS target_id,
@@ -423,8 +423,9 @@ CREATE VIEW graph_edges AS
         until
     FROM professional_links
   UNION ALL
+    -- family_links A → B  (forward direction)
     SELECT
-        id,
+        (id::TEXT || '-fwd')   AS id,
         'family_links'      AS edge_type,
         person_a_id::TEXT   AS source_id,
         person_b_id::TEXT   AS target_id,
@@ -434,9 +435,22 @@ CREATE VIEW graph_edges AS
         NULL::DATE          AS until
     FROM family_links
   UNION ALL
+    -- family_links B → A  (reverse direction — family ties are symmetric,
+    -- so NetworkX can traverse the conflict cycle from EITHER person)
+    SELECT
+        (id::TEXT || '-rev')   AS id,
+        'family_links'      AS edge_type,
+        person_b_id::TEXT   AS source_id,
+        person_a_id::TEXT   AS target_id,
+        relation            AS label,
+        TRUE                AS is_active,
+        NULL::DATE          AS since,
+        NULL::DATE          AS until
+    FROM family_links
+  UNION ALL
     -- Agency → Tender (awards direction)
     SELECT
-        id,
+        (id::TEXT || '-award') AS id,
         'allocation'        AS edge_type,
         agency_id::TEXT     AS source_id,
         tender_id::TEXT     AS target_id,
@@ -448,7 +462,7 @@ CREATE VIEW graph_edges AS
   UNION ALL
     -- Tender → Company (won_by direction)
     SELECT
-        id,
+        (id::TEXT || '-win') AS id,
         'allocation_winner' AS edge_type,
         tender_id::TEXT     AS source_id,
         winning_company_id::TEXT AS target_id,
@@ -459,7 +473,7 @@ CREATE VIEW graph_edges AS
     FROM allocations
   UNION ALL
     SELECT
-        id,
+        id::TEXT            AS id,
         'bid_participation' AS edge_type,
         company_id::TEXT    AS source_id,
         tender_id::TEXT     AS target_id,
@@ -468,3 +482,53 @@ CREATE VIEW graph_edges AS
         NULL::DATE          AS since,
         NULL::DATE          AS until
     FROM bid_participations;
+
+-- ============================================================
+-- ROW LEVEL SECURITY  (fix #4)
+-- ------------------------------------------------------------
+-- IMPORTANT operational note:
+--   The FastAPI backend MUST connect with the SUPABASE SERVICE_ROLE key.
+--   service_role bypasses RLS, so the backend keeps full access.
+--   The PUBLIC (anon) key — exposed to browsers — is what these
+--   policies lock down.
+--
+-- Threat model for an anti-corruption tool:
+--   The graph holds CINs and family ties of public officials.
+--   That is CONFIDENTIAL investigative data, NOT open data.
+--   It must never be readable through the public anon API key.
+--   Whistleblower reports must be write-only from the public:
+--   a citizen can SUBMIT, but no one can READ reports via the anon key.
+-- ============================================================
+
+-- Enable RLS on every table (default-deny once enabled)
+ALTER TABLE agencies           ENABLE ROW LEVEL SECURITY;
+ALTER TABLE persons            ENABLE ROW LEVEL SECURITY;
+ALTER TABLE companies          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tenders            ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public_links       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE professional_links ENABLE ROW LEVEL SECURITY;
+ALTER TABLE family_links       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE allocations        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bid_participations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE reports            ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ocds_releases      ENABLE ROW LEVEL SECURITY;
+
+-- ── REPORTS: the ONLY thing the public may do is SUBMIT a report ──
+-- Anonymous citizen can INSERT a report...
+CREATE POLICY reports_anon_insert
+    ON reports FOR INSERT
+    TO anon
+    WITH CHECK (true);
+
+-- ...but there is intentionally NO anon SELECT/UPDATE/DELETE policy,
+-- so whistleblower submissions are unreadable via the public key.
+-- Only the backend (service_role) can read them for triage.
+
+-- ── Everything else has NO anon policy at all ──
+-- With RLS enabled and no permissive policy, the anon key gets zero
+-- rows from the graph tables. All graph reads go through the backend,
+-- which uses service_role and bypasses RLS.
+--
+-- (If later you want the *non-sensitive* contract list to be public
+--  open-data, add a narrow SELECT policy on a dedicated public view
+--  that excludes persons.cin and family_links — not on the base tables.)
