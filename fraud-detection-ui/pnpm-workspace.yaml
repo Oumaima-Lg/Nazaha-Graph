@@ -1,0 +1,14 @@
+supportedArchitectures:
+  os:
+    - linux
+  cpu:
+    - x64
+  libc:
+    - glibc
+
+overrides:
+  hono: "4.12.25"
+
+allowBuilds:
+  sharp: true
+  msw: false

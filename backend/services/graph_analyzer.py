@@ -1,5 +1,6 @@
 import asyncio
 from collections import defaultdict
+from datetime import date
 from typing import Any
 
 import networkx as nx
@@ -182,7 +183,7 @@ def build_graph_from_ocds(package: OCDSReleasePackage) -> tuple[list[GraphNode],
     return list(nodes.values()), edges, contracts
 
 
-async def analyze_ocds_package(package: OCDSReleasePackage, source: str = "supabase") -> AnalyzeResponse:
+async def analyze_ocds_package(package: OCDSReleasePackage, source: str = "sample") -> AnalyzeResponse:
     nodes, edges, contracts = await asyncio.to_thread(build_graph_from_ocds, package)
 
     company_ids = [n.id for n in nodes if n.type in {"company", "supplier"} and n.isSuspect]
@@ -229,4 +230,326 @@ async def analyze_ocds_package(package: OCDSReleasePackage, source: str = "supab
             "contracts_analyzed": len(contracts),
         },
         source=source,
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SUPABASE GRAPH ANALYSIS — reads real relational graph, detects 5 fraud patterns
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_EDGE_WEIGHT: dict[str, str] = {
+    "family_links": "strong",
+    "public_links": "strong",
+    "professional_links": "medium",
+    "allocation": "medium",
+    "allocation_winner": "medium",
+    "bid_participation": "weak",
+}
+
+
+def _mad_amount(value: Any) -> str:
+    if value is None:
+        return "N/A"
+    try:
+        return f"{float(value):,.0f} MAD".replace(",", " ")
+    except (TypeError, ValueError):
+        return "N/A"
+
+
+def _parse_date(d: Any) -> date | None:
+    if not d:
+        return None
+    try:
+        return date.fromisoformat(str(d)[:10])
+    except (ValueError, TypeError):
+        return None
+
+
+def _detect_family_conflict(
+    G: nx.DiGraph,
+    suspect_nodes: set[str],
+    suspect_tenders: set[str],
+) -> None:
+    """Detect direct and indirect family conflicts of interest [Scenarios A & B].
+
+    For each tender: if the presiding official (ordonnateur / président_commission)
+    of the awarding agency has a family link to a person at the winning company,
+    flag all four nodes (official, family_member, company, tender) as suspect.
+    """
+    for tender_id, tdata in G.nodes(data=True):
+        if tdata.get("node_type") != "tender":
+            continue
+
+        winning = [
+            tgt for tgt in G.successors(tender_id)
+            if G[tender_id][tgt].get("edge_type") == "allocation_winner"
+        ]
+        if not winning:
+            continue
+        company_id = winning[0]
+
+        agencies = [
+            src for src in G.predecessors(tender_id)
+            if G[src][tender_id].get("edge_type") == "allocation"
+        ]
+        if not agencies:
+            continue
+        agency_id = agencies[0]
+
+        officials = [
+            src for src in G.predecessors(agency_id)
+            if G[src][agency_id].get("edge_type") == "public_links"
+            and G[src][agency_id].get("label") in ("president_commission", "ordonnateur")
+        ]
+
+        company_persons = [
+            src for src in G.predecessors(company_id)
+            if G[src][company_id].get("edge_type") == "professional_links"
+        ]
+
+        for official in officials:
+            for cp in company_persons:
+                has_family = (
+                    G.has_edge(official, cp)
+                    and G[official][cp].get("edge_type") == "family_links"
+                ) or (
+                    G.has_edge(cp, official)
+                    and G[cp][official].get("edge_type") == "family_links"
+                )
+                if has_family:
+                    suspect_nodes |= {tender_id, official, cp, company_id}
+                    suspect_tenders.add(tender_id)
+
+
+def _detect_collusion_rotation(
+    G: nx.DiGraph,
+    suspect_nodes: set[str],
+    suspect_tenders: set[str],
+) -> None:
+    """Detect bid-rotation collusion rings [Scenario C].
+
+    Companies that always appear together as bidders on the same tenders
+    (≥3 bidders, co-appearing on ≥2 tenders) form a suspect cartel.
+    """
+    tender_bidders: dict[str, set[str]] = defaultdict(set)
+    for company_id, tender_id, edata in G.edges(data=True):
+        if edata.get("edge_type") == "bid_participation":
+            tender_bidders[tender_id].add(company_id)
+
+    multi_tender = {t for t, comps in tender_bidders.items() if len(comps) >= 3}
+
+    co_bid_count: dict[tuple[str, str], int] = defaultdict(int)
+    for tender_id in multi_tender:
+        companies = sorted(tender_bidders[tender_id])
+        for i in range(len(companies)):
+            for j in range(i + 1, len(companies)):
+                co_bid_count[(companies[i], companies[j])] += 1
+
+    for (comp_a, comp_b), count in co_bid_count.items():
+        if count >= 2:
+            suspect_nodes |= {comp_a, comp_b}
+            for tender_id in multi_tender:
+                if comp_a in tender_bidders[tender_id] and comp_b in tender_bidders[tender_id]:
+                    suspect_nodes.add(tender_id)
+                    suspect_tenders.add(tender_id)
+
+
+def _detect_pantouflage(
+    G: nx.DiGraph,
+    suspect_nodes: set[str],
+    suspect_tenders: set[str],
+) -> None:
+    """Detect pantouflage (revolving-door) [Scenario D].
+
+    A public official leaves their post (public_link.until) and joins a private
+    company (professional_link.since) within 36 months. If that company then wins
+    a tender from the same agency, it is flagged as suspect.
+    """
+    PANTOUFLAGE_MONTHS = 36
+
+    for person_id, pdata in G.nodes(data=True):
+        if pdata.get("node_type") != "person":
+            continue
+
+        past_agencies: list[tuple[str, date]] = []
+        for _, agency_id, edata in G.out_edges(person_id, data=True):
+            if edata.get("edge_type") == "public_links":
+                left = _parse_date(edata.get("until"))
+                if left:
+                    past_agencies.append((agency_id, left))
+
+        if not past_agencies:
+            continue
+
+        private_companies: list[tuple[str, date]] = []
+        for _, company_id, edata in G.out_edges(person_id, data=True):
+            if edata.get("edge_type") == "professional_links":
+                joined = _parse_date(edata.get("since"))
+                if joined:
+                    private_companies.append((company_id, joined))
+
+        if not private_companies:
+            continue
+
+        for agency_id, left_date in past_agencies:
+            for company_id, joined_date in private_companies:
+                if joined_date < left_date:
+                    continue
+                months_gap = (
+                    (joined_date.year - left_date.year) * 12
+                    + (joined_date.month - left_date.month)
+                )
+                if months_gap > PANTOUFLAGE_MONTHS:
+                    continue
+
+                # Check if this company won a tender from that same agency
+                for pred in G.predecessors(company_id):
+                    edge = G.get_edge_data(pred, company_id, default={})
+                    if edge.get("edge_type") != "allocation_winner":
+                        continue
+                    tender_id = pred
+                    awarding = [
+                        src for src in G.predecessors(tender_id)
+                        if G[src][tender_id].get("edge_type") == "allocation"
+                    ]
+                    if agency_id in awarding:
+                        suspect_nodes |= {person_id, company_id, tender_id}
+                        suspect_tenders.add(tender_id)
+
+
+def _detect_fractionnement(
+    suspect_nodes: set[str],
+    suspect_tenders: set[str],
+    raw_tenders: list[dict],
+) -> None:
+    """Detect contract splitting below the open-tender threshold [Scenario E].
+
+    If the same company wins ≥3 bons de commande from the same agency,
+    each below 1 000 000 MAD, those contracts are flagged as suspect.
+    """
+    THRESHOLD_MAD = 1_000_000
+    MIN_COUNT = 3
+
+    groups: dict[tuple[str, str], list[str]] = defaultdict(list)
+    for t in raw_tenders:
+        if (
+            t.get("type") == "bon_de_commande"
+            and t.get("awarded_value_mad") is not None
+            and float(t["awarded_value_mad"]) < THRESHOLD_MAD
+            and t.get("winning_company_id")
+            and t.get("agency_id")
+        ):
+            key = (str(t["agency_id"]), str(t["winning_company_id"]))
+            groups[key].append(str(t["id"]))
+
+    for (_, company_id), tender_ids in groups.items():
+        if len(tender_ids) >= MIN_COUNT:
+            suspect_nodes.add(company_id)
+            for tid in tender_ids:
+                suspect_nodes.add(tid)
+                suspect_tenders.add(tid)
+
+
+def _detect_single_bidder(
+    suspect_nodes: set[str],
+    suspect_tenders: set[str],
+    raw_tenders: list[dict],
+) -> None:
+    """Flag open tenders that received only a single bid (marché fictif signal)."""
+    for t in raw_tenders:
+        if t.get("single_bidder") and t.get("type") == "appel_offres_ouvert":
+            tid = str(t["id"])
+            suspect_nodes.add(tid)
+            suspect_tenders.add(tid)
+
+
+def _contract_status_from_tender(t: dict, tid: str, suspect_tenders: set[str]) -> str:
+    db_status = t.get("status", "")
+    if db_status in ("annule", "resilie", "contentieux"):
+        return "rejete"
+    if tid in suspect_tenders:
+        return "suspect"
+    return "sain"
+
+
+def _tender_risk_score(t: dict, tid: str, suspect_tenders: set[str]) -> int:
+    score = 50 if tid in suspect_tenders else 0
+    if t.get("single_bidder"):
+        score += 20
+    if t.get("fractionnement_flag"):
+        score += 15
+    return min(100, score)
+
+
+async def analyze_from_supabase() -> AnalyzeResponse:
+    """Build fraud graph from real Supabase data and run all 5 detection algorithms."""
+    from services.graph_loader import load_graph_from_supabase  # local to avoid circular import at module load
+
+    G, raw_nodes, raw_edges, raw_tenders = await load_graph_from_supabase()
+
+    suspect_nodes: set[str] = set()
+    suspect_tenders: set[str] = set()
+
+    _detect_family_conflict(G, suspect_nodes, suspect_tenders)
+    _detect_collusion_rotation(G, suspect_nodes, suspect_tenders)
+    _detect_pantouflage(G, suspect_nodes, suspect_tenders)
+    _detect_fractionnement(suspect_nodes, suspect_tenders, raw_tenders)
+    _detect_single_bidder(suspect_nodes, suspect_tenders, raw_tenders)
+
+    api_nodes: list[GraphNode] = []
+    for n in raw_nodes:
+        nid = str(n["id"])
+        is_suspect = nid in suspect_nodes or n.get("inpplc_risk_level") == "high"
+        inpplc = {"risk_level": n["inpplc_risk_level"]} if n.get("inpplc_risk_level") else None
+        api_nodes.append(
+            GraphNode(
+                id=nid,
+                label=n.get("label") or nid,
+                type=n.get("node_type", "company"),
+                isSuspect=is_suspect,
+                inpplc=inpplc,
+            )
+        )
+
+    api_edges: list[GraphEdge] = [
+        GraphEdge(
+            source=str(e["source_id"]),
+            target=str(e["target_id"]),
+            weight=_EDGE_WEIGHT.get(e.get("edge_type", ""), "weak"),
+            relation=e.get("label"),
+        )
+        for e in raw_edges
+    ]
+
+    api_contracts: list[ContractSummary] = []
+    for t in raw_tenders:
+        tid = str(t["id"])
+        vendor = (t.get("companies") or {}).get("name") or "—"
+        status = _contract_status_from_tender(t, tid, suspect_tenders)
+        score = _tender_risk_score(t, tid, suspect_tenders)
+        api_contracts.append(
+            ContractSummary(
+                id=t.get("reference_dossier") or tid,
+                title=t.get("title") or tid,
+                vendor=vendor,
+                amount=_mad_amount(t.get("awarded_value_mad")),
+                date=str(t.get("date_attribution") or ""),
+                status=status,
+                riskScore=score,
+            )
+        )
+
+    suspect_count = sum(1 for n in api_nodes if n.isSuspect)
+    return AnalyzeResponse(
+        nodes=api_nodes,
+        edges=api_edges,
+        contracts=api_contracts,
+        stats={
+            "total_nodes": len(api_nodes),
+            "total_edges": len(api_edges),
+            "suspect_nodes": suspect_count,
+            "contracts_analyzed": len(api_contracts),
+            "suspect_contracts": sum(1 for c in api_contracts if c.status == "suspect"),
+        },
+        source="supabase",
     )

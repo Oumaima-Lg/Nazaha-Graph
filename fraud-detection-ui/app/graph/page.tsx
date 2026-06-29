@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { AppLayout } from '@/components/app-layout'
 import { NetworkGraph, type GraphNode, type GraphEdge } from '@/components/network-graph'
+import { FraudExplainer } from '@/components/fraud-explainer'
 import { NodeDetails } from '@/components/node-details'
 import { fetchAnalyze, mapAnalyzeToGraphData } from '@/lib/api'
 import { mockGraphData, mockDashboardData } from '@/lib/mock-data'
@@ -497,12 +498,15 @@ function GraphPageInner() {
           {/* Zone graphe */}
           <div className="flex-1 min-w-0">
             {isExternalFilter || isGenerated ? (
-              <NetworkGraph
-                nodes={displayData.nodes}
-                edges={displayData.edges}
-                selectedNode={selectedNode}
-                onNodeSelect={setSelectedNode}
-              />
+              <div className="space-y-6">
+                <NetworkGraph
+                  nodes={displayData.nodes}
+                  edges={displayData.edges}
+                  selectedNode={selectedNode}
+                  onNodeSelect={setSelectedNode}
+                />
+                <FraudExplainer nodes={displayData.nodes} edges={displayData.edges} />
+              </div>
             ) : (
               /* État vide : invitation à utiliser les filtres */
               <div className="flex flex-col items-center justify-center h-[520px] rounded-xl border-2 border-dashed border-border bg-secondary/20 text-center px-8">

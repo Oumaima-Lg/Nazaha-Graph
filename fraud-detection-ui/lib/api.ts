@@ -123,6 +123,7 @@ export function mapAnalyzeToGraphData(data: AnalyzeResponse) {
       source: edge.source,
       target: edge.target,
       weight: edge.weight,
+      relation: edge.relation ?? null,
     })),
   }
 }
